@@ -1,20 +1,145 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+    <ion-title> Vosk Speech-to-Text </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
+      <ion-title size="large">Vosk Speech-to-Text</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+  <div class="container">
+    <!-- speech Recognition Section -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="mic" color="primary"></ion-icon>
+          Speech Recognition {{selectedLanguage()}}
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <div class="recognition-controls">
+          @if (!isRecording()) {
+          <ion-button
+            expand="block"
+            color="success"
+            (click)="startRecognition()"
+            [disabled]="!isModelDownloaded(selectedLanguage())"
+          >
+            <ion-icon name="mic" slot="start" />
+            Start Recognition
+          </ion-button>
+          } @if (isRecording()) {
+          <ion-button (click)="stopRecognition()" color="danger" expand="block">
+            <ion-icon name="mic-off" slot="start" />
+            Stop Recognition
+          </ion-button>
+          }
+        </div>
+
+        @if (recognitionText()) {
+        <div class="recognition-text">
+          <h3>Recognized Text:</h3>
+          <p>{{ recognitionText() }}</p>
+        </div>
+        }
+      </ion-card-content>
+    </ion-card>
+
+    <!-- language selection -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="globe" color="primary" />
+          Language Selection {{supportedLanguages().length}}
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-list>
+          @for(language of supportedLanguages(); track language.code) {
+          <ion-item>
+            <ion-label>
+              <h3>{{ language.name }}</h3>
+              <p>{{ language.code }}</p>
+            </ion-label>
+
+            @if (!isModelDownloaded(language.code)) {
+            <ion-chip slot="end" [color]="'warning'" (click)="downloadModel(language.code)">
+              <ion-icon [name]="'download'" />
+              <ion-label>
+                Download
+                @if (isDownloading()) {
+                  {{downloadProgress()}}%
+                }
+              </ion-label>
+            </ion-chip>
+            }@else {
+            <ion-chip
+              slot="end"
+              (click)="selectedLanguage.set(language.code);"
+              [color]="'success'"
+            >
+              <ion-icon [name]="'checkmark-circle'" />
+              <ion-label>Select</ion-label>
+            </ion-chip>
+            }
+          </ion-item>
+          }
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Download Progress -->
+    @if (isDownloading()) {
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="download" color="primary"></ion-icon>
+          Downloading Model
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-progress-bar [value]="downloadProgress() / 100"></ion-progress-bar>
+        <p class="download-message">{{ downloadMessage() }}</p>
+        <p class="download-progress">{{ downloadProgress() }}%</p>
+      </ion-card-content>
+    </ion-card>
+    }
+    <!-- Quick Actions -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="settings" color="primary"></ion-icon>
+          Quick Actions
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="quick-actions">
+          <ion-button
+            (click)="downloadModel('en-us')"
+            color="primary"
+            fill="outline"
+            [disabled]="isModelDownloaded('en-us') || isDownloading()"
+          >
+            <ion-icon name="download" slot="start"></ion-icon>
+            Download English (US)
+          </ion-button>
+
+          <ion-button
+            (click)="loadDownloadedModels()"
+            color="secondary"
+            fill="outline"
+          >
+            <ion-icon name="refresh" slot="start"></ion-icon>
+            Refresh Models
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
   </div>
 </ion-content>
