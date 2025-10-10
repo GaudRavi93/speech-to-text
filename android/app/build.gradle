@@ -36,6 +36,16 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
+
+    // vosk API dependencies
+    implementation('com.alphacephei:vosk-android:0.3.70') {
+        exclude group: 'net.java.dev.jna', module: 'jna'
+    }
+    implementation 'org.json:json:20231013'
+    implementation 'net.lingala.zip4j:zip4j:2.11.5'
+    implementation "net.java.dev.jna:jna:5.9.0@aar"
+    implementation 'androidx.work:work-runtime:2.8.1'
+
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
